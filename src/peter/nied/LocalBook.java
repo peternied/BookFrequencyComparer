@@ -42,7 +42,7 @@ public class LocalBook implements IBook
      *            The file path location to the book
      * @return The validated local book for usage
      */
-    public LocalBook getNewBookFromPath(final String path)
+    public static LocalBook getNewBookFromPath(final String path)
     {
         return new LocalBook(path);
     }
