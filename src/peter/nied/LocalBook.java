@@ -10,7 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * An implementatoin for a book that is stored on the local file system
+ * An implementation for a book that is stored on the local file system
  * 
  * @author petern
  * 
@@ -96,7 +96,7 @@ public class LocalBook implements IBook
     }
 
     @Override
-    public List<String> asWords(final WordParser parser)
+    public List<String> asWords()
     {
         List<String> words = new LinkedList<String>();
         final List<String> lines = getFileLines();
