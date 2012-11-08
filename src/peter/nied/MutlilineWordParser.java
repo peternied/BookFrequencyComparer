@@ -105,8 +105,6 @@ public class MutlilineWordParser extends BasicWordParser
                 {
                     try
                     {
-                        System.out.println("Maybe tag: " + line.substring(i + 1, i + 5) + " '" + line.charAt(i + 5)
-                            + "'");
                         if ("body".equals(line.substring(i + 1, i + 5).toLowerCase())
                             && isValidWordTerminator(line.charAt(i + 5)))
                         {
