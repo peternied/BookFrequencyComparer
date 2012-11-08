@@ -25,29 +25,47 @@ public class ExampleCompareBooks
         parser.setOnlyStartCountingAfterBodyTag(true);
         final List<String> poeRawWords = poe.asWords(parser);
 
-
         final Map<String, Integer> vernWordMap = new HashMap<String, Integer>();
         for (final String s : poeRawWords)
         {
-            final String word = s.toLowerCase();
-            if (vernWordMap.containsKey(word))
+            String word = s.toLowerCase();
+
+            final String[] subWords = word.split("-");
+            if (subWords.length > 1)
             {
-                vernWordMap.put(word, vernWordMap.get(word) + 1);
+                for (String subWord : subWords)
+                {
+                    if (subWord != null && subWord.length() != 0)
+                    {
+                        incrementWordCount(vernWordMap, subWord);
+                    }
+                }
             }
             else
             {
-                vernWordMap.put(word, 1);
+                incrementWordCount(vernWordMap, word);
             }
         }
-        
 
         System.out.println("Vern words: " + vernWordMap.size());
         System.out.println("The " + vernWordMap.get("the"));
         System.out.println("of " + vernWordMap.get("of"));
         System.out.println("to " + vernWordMap.get("to"));
         System.out.println("and " + vernWordMap.get("and"));
-        
+
         System.out.println("Poe words: " + poeRawWords.size());
+    }
+
+    private static void incrementWordCount(final Map<String, Integer> vernWordMap, String word)
+    {
+        if (vernWordMap.containsKey(word))
+        {
+            vernWordMap.put(word, vernWordMap.get(word) + 1);
+        }
+        else
+        {
+            vernWordMap.put(word, 1);
+        }
     }
 
 }

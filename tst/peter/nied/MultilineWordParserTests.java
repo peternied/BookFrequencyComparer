@@ -124,4 +124,15 @@ public class MultilineWordParserTests extends BasicWordParserTests
         }
         Assert.assertEquals("Expected to find all of the words", expectedWords.size(), wordsFoundInBook.size());
     }
+
+    @Test
+    public void testDoubleHyphenation() throws Exception
+    {
+        final File file = createTempFileWithContents("one--the");
+        final IBook book = LocalBook.getNewBookFromPath(file.getAbsolutePath());
+        final List<String> wordsFoundInBook = book.asWords(mParser);
+        Assert.assertEquals("Expected to find a word", 1, wordsFoundInBook.size());
+        Assert.assertEquals("Make sure we found the expected word", "one--the", wordsFoundInBook.get(0));
+
+    }
 }
