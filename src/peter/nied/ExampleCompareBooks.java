@@ -1,13 +1,7 @@
 
 package peter.nied;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import com.sun.corba.se.impl.ior.FreezableList;
 
 public class ExampleCompareBooks
 {
@@ -19,9 +13,7 @@ public class ExampleCompareBooks
      */
     public static void main(String[] args)
     {
-        final IBook vern =
-                LocalBook
-                        .getNewBookFromPath("C:\\depot\\BookCompare\\test-content\\a_journey_to_the_interior_of_the_earth.htm");
+        final IBook vern = LocalBook.getNewBookFromPath(".\\test-content\\a_journey_to_the_interior_of_the_earth.htm");
         final MutlilineWordParser vernParser = new MutlilineWordParser();
         vernParser.setOnlyStartCountingAfterBodyTag(true);
         final List<String> vernRawWords = vern.asWords(vernParser);
@@ -34,7 +26,7 @@ public class ExampleCompareBooks
             System.out.println(frequencyValue.mWord + " " + frequencyValue.mFrequency);
         }
 
-        final IBook poe = LocalBook.getNewBookFromPath("C:\\depot\\BookCompare\\test-content\\the_raven.htm");
+        final IBook poe = LocalBook.getNewBookFromPath(".\\test-content\\the_raven.htm");
         final MutlilineWordParser parser = new MutlilineWordParser();
         parser.setOnlyStartCountingAfterBodyTag(true);
         final List<String> poeRawWords = poe.asWords(parser);
