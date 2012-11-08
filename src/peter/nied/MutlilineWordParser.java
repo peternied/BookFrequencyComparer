@@ -1,65 +1,28 @@
 
 package peter.nied;
 
-import java.util.Arrays;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Parser that finds words that meet the following:
- * Exclude numbers, words with numbers, punctuation, spaces, symbols
+ * An extension of the base word parser that retains state information so that we can detect words that are across
+ * multiple lines
  * 
  * @author petern
  * 
  */
-public class BaseWordParser implements IWordParser
+public class MutlilineWordParser extends BasicWordParser
 {
-    public List<Character> getValidWordTerminators()
-    {
-        return Arrays.asList('\n', ' ', '\t');
-    }
+    protected String mPreviousWordChunk = null;
 
-    private boolean isValidWordTerminator(final char c)
-    {
-        for (char validTerminator : getValidWordTerminators())
-        {
-            if (c == validTerminator)
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
+    @Override
     public List<Character> getValidWordCharacters()
     {
-        List<Character> validCharacters = new LinkedList<Character>();
+        final List<Character> validCharacters = new ArrayList<Character>(super.getValidWordCharacters());
 
-        // Add all lower case alphabetic characters
-        for (char n = 'a'; n <= 'z'; n++)
-        {
-            validCharacters.add(n);
-        }
-
-        // Add all upper case alphabetic characters
-        for (char n = 'A'; n <= 'Z'; n++)
-        {
-            validCharacters.add(n);
-        }
-
+        // We should allow hyphen character as well as they could represent a word that is going to span multiple lines
+        validCharacters.add('-');
         return validCharacters;
-    }
-
-    private boolean isValidWordCharacter(final char c)
-    {
-        for (char validWordCharacter : getValidWordCharacters())
-        {
-            if (c == validWordCharacter)
-            {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**
@@ -96,6 +59,7 @@ public class BaseWordParser implements IWordParser
             else if (!isValidWordCharacter(currentChar))
             {
                 lastWordStart = -1;
+                mPreviousWordChunk = null;
             }
         }
 
@@ -103,24 +67,43 @@ public class BaseWordParser implements IWordParser
         if (lastWordStart != -1)
         {
             final String word = line.substring(lastWordStart, line.length());
-            addWordIfValid(words, word);
+
+            // If the final character of the last word has a hyphen we have a word that is spanning multiple lines
+            if (word.length() != 0 && word.charAt(word.length() - 1) == '-')
+            {
+                mPreviousWordChunk = word;
+            }
+            else
+            {
+                addWordIfValid(words, word);
+            }
         }
     }
 
-    /**
-     * Final checks that need to take place on words before they are added into the collection
-     * 
-     * @param words
-     *            The list of words to add this word into
-     * @param word
-     *            The word to be added provided it passes the final checks
-     */
-    private void addWordIfValid(final List<String> words, final String word)
+    @Override
+    protected void addWordIfValid(final List<String> words, final String word)
     {
-        if (word.length() == 0)
+        String currentWord = word;
+        // If we have a previous word chunk on hand, it represents a word that ended with a hypen on the
+        // previous line
+        if (mPreviousWordChunk != null)
+        {
+            currentWord = mPreviousWordChunk + word;
+            mPreviousWordChunk = null;
+        }
+
+        
+        // We do not accept null or empty string characters
+        if (currentWord == null || currentWord.length() == 0)
         {
             return;
         }
-        words.add(word);
+
+        // hyphenated words are only valid if the hyphen is contained within the middle of the word (Non first/last positions)
+        if (currentWord.charAt(0) == '-'  || currentWord.charAt(currentWord.length() - 1) == '-')
+        {
+            return;
+        }
+        super.addWordIfValid(words, currentWord);
     }
 }
