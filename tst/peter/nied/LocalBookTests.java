@@ -86,6 +86,26 @@ public class LocalBookTests extends TestCase
     }
 
     @Test
+    public void testMultipleValidWordsAlsoWithInvalids() throws Exception
+    {
+        final Set<String> expectedWords = new HashSet<String>();
+        expectedWords.add("asdf");
+        expectedWords.add("qwerty");
+        expectedWords.add("a");
+
+        final File file = createTempFileWithContents("asdf a 3aa3 a3a a3 3a ** 3*a' qwerty");
+        final IBook book = LocalBook.getNewBookFromPath(file.getAbsolutePath());
+        final List<String> wordsFoundInBook = book.asWords(new BaseWordParser());
+
+        for (final String foundWord : wordsFoundInBook)
+        {
+            Assert.assertTrue("Expecting to find this word '" + foundWord + "' in the list of expected words",
+                expectedWords.contains(foundWord));
+        }
+        Assert.assertEquals("Expected to find all of the words", expectedWords.size(), wordsFoundInBook.size());
+    }
+
+    @Test
     public void testNoEmptyStringWords() throws Exception
     {
         final File file = createTempFileWithContents(" \n   \t \t\t\n");
