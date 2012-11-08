@@ -127,10 +127,7 @@ public class LocalBook implements IBook
                 if (lastWordStart != -1)
                 {
                     final String word = line.substring(lastWordStart, i);
-                    if (word.length() != 0)
-                    {
-                        words.add(word);
-                    }
+                    addWordIfValid(words, word);
                 }
                 lastWordStart = i + 1;
             }
@@ -146,11 +143,25 @@ public class LocalBook implements IBook
         if (lastWordStart != -1)
         {
             final String word = line.substring(lastWordStart, line.length());
-            if (word.length() != 0)
-            {
-                words.add(word);
-            }
+            addWordIfValid(words, word);
         }
+    }
+
+    /**
+     * Final checks that need to take place on words before they are added into the collection
+     * 
+     * @param words
+     *            The list of words to add this word into
+     * @param word
+     *            The word to be added provided it passes the final checks
+     */
+    private void addWordIfValid(final List<String> words, final String word)
+    {
+        if (word.length() == 0)
+        {
+            return;
+        }
+        words.add(word);
     }
 
     private List<String> getFileLines()
