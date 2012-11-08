@@ -13,7 +13,19 @@ import java.util.List;
  */
 public class MutlilineWordParser extends BasicWordParser
 {
+    protected boolean mInHtmlTag = false;
     protected String mPreviousWordChunk = null;
+
+    @Override
+    public List<Character> getValidWordTerminators()
+    {
+        final List<Character> validWordTermintors = new ArrayList<Character>(super.getValidWordTerminators());
+
+        // The starting html tag is a way that words can be signified as started
+        validWordTermintors.add('<');
+        validWordTermintors.add('>');
+        return validWordTermintors;
+    }
 
     @Override
     public List<Character> getValidWordCharacters()
@@ -41,6 +53,24 @@ public class MutlilineWordParser extends BasicWordParser
         for (int i = 0; i < line.length(); i++)
         {
             final char currentChar = line.charAt(i);
+
+            if (currentChar == '>')
+            {
+                lastWordStart = -1;
+                mInHtmlTag = false;
+            }
+
+            // If we are in the middle of an html tag ignore it
+            if (mInHtmlTag)
+            {
+                continue;
+            }
+
+            // If we detect that there is a html tag starting there might be a valid word behind it
+            if (currentChar == '<')
+            {
+                mInHtmlTag = true;
+            }
 
             // If we have found a valid word termination then record the word assuming there was a word start
             // recorded. Once this is done, reset the last word start to the next character (It will be marked invalid
@@ -92,18 +122,25 @@ public class MutlilineWordParser extends BasicWordParser
             mPreviousWordChunk = null;
         }
 
-        
         // We do not accept null or empty string characters
         if (currentWord == null || currentWord.length() == 0)
         {
             return;
         }
 
-        // hyphenated words are only valid if the hyphen is contained within the middle of the word (Non first/last positions)
-        if (currentWord.charAt(0) == '-'  || currentWord.charAt(currentWord.length() - 1) == '-')
+        // hyphenated words are only valid if the hyphen is contained within the middle of the word (Non first/last
+        // positions)
+        if (currentWord.charAt(0) == '-' || currentWord.charAt(currentWord.length() - 1) == '-')
         {
             return;
         }
+
+        // Do not allow words that are all upper case to be used
+        if (currentWord.equals(currentWord.toUpperCase()))
+        {
+            return;
+        }
+
         super.addWordIfValid(words, currentWord);
     }
 }

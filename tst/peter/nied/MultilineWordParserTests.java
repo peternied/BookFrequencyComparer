@@ -84,4 +84,44 @@ public class MultilineWordParserTests extends BasicWordParserTests
         Assert.assertEquals("Expected to find all of the words", expectedWords.size(), wordsFoundInBook.size());
     }
 
+    @Test
+    public void testNoHtmlTagElementsFound() throws Exception
+    {
+        final File file = createTempFileWithContents("<body><table some attribute><td></td></table></body>");
+        final IBook book = LocalBook.getNewBookFromPath(file.getAbsolutePath());
+        final List<String> wordsFoundInBook = book.asWords(mParser);
+        Assert.assertEquals("Expect to not find any words", 0, wordsFoundInBook.size());
+    }
+
+    @Test
+    public void testNoAllCapsWordsFound() throws Exception
+    {
+        final File file = createTempFileWithContents("THE BROWN DOG JUMPED OVER THE MOON");
+        final IBook book = LocalBook.getNewBookFromPath(file.getAbsolutePath());
+        final List<String> wordsFoundInBook = book.asWords(mParser);
+        Assert.assertEquals("Expect to not find any words", 0, wordsFoundInBook.size());
+    }
+
+    @Test
+    public void testMultipleWordsInsideHtmlTagsFound() throws Exception
+    {
+        final Set<String> expectedWords = new HashSet<String>();
+        expectedWords.add("cat");
+        expectedWords.add("dog");
+        expectedWords.add("a-b");
+        expectedWords.add("can-not");
+        expectedWords.add("baby-boy");
+
+        final File file =
+                createTempFileWithContents("cat <body foo > a-b\n</body>\n a3 a3-4s 4th <tag><tagger>dog</tagger></tag> 4\n can-\nnot 2-3 .\n-. \n-a \nbaby-boy");
+        final IBook book = LocalBook.getNewBookFromPath(file.getAbsolutePath());
+        final List<String> wordsFoundInBook = book.asWords(mParser);
+
+        for (final String foundWord : wordsFoundInBook)
+        {
+            Assert.assertTrue("Expecting to find this word '" + foundWord + "' in the list of expected words",
+                expectedWords.contains(foundWord));
+        }
+        Assert.assertEquals("Expected to find all of the words", expectedWords.size(), wordsFoundInBook.size());
+    }
 }
