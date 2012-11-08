@@ -98,35 +98,37 @@ public class LocalBook implements IBook
     @Override
     public List<String> asWords()
     {
-        List<String> words = new LinkedList<String>();
+        final List<String> words = new LinkedList<String>();
         final List<String> lines = getFileLines();
 
         for (final String line : lines)
         {
             // Parse loop
             parseWordFromLine(words, line);
-
         }
 
-        return null;
+        return words;
     }
 
     private void parseWordFromLine(List<String> words, final String line)
     {
         // Use this to keep track of where the start of the last word is
-        int lastWordStart = -1;
+        int lastWordStart = 0;
 
         for (int i = 0; i < line.length(); i++)
         {
             final char currentChar = line.charAt(i);
 
             // If we have found a valid word termination then record the word assuming there was a word start
-            // recorded.  Once this is done, reset the last word start
-            if (isValidWordTerminator(currentChar) && lastWordStart != -1)
+            // recorded. Once this is done, reset the last word start to the next character (It will be marked invalid
+            // if this is the case when that character is reached)
+            if (isValidWordTerminator(currentChar))
             {
-                // Using (i - 1) because the terminator is not considered part of the word
-                words.add(line.substring(lastWordStart, i - 1));
-                lastWordStart = -1;
+                if (lastWordStart != -1)
+                {
+                    words.add(line.substring(lastWordStart, i));
+                }
+                lastWordStart = i + 1;
             }
 
             // If we have found that the character is not a valid character this invalidates the word progress
@@ -134,19 +136,10 @@ public class LocalBook implements IBook
             {
                 lastWordStart = -1;
             }
-            // If we made it this far, it wasn't a word terminator or a invalid character, so it must be considered
-            // valid, set the start index if it wasn't already set
-            else
-            {
-                if (lastWordStart == -1)
-                {
-                    lastWordStart = i;
-                }
-            }
         }
-        
-        //it is possible that the last word on the line ended at the line end, so make sure we account for it
-        if(lastWordStart != -1)
+
+        // it is possible that the last word on the line ended at the line end, so make sure we account for it
+        if (lastWordStart != -1)
         {
             words.add(line.substring(lastWordStart, line.length()));
         }
