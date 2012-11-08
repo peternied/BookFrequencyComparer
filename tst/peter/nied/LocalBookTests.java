@@ -12,7 +12,7 @@ import junit.framework.Assert;
 import junit.framework.TestCase;
 
 /**
- * Test cases for making sure local book works as designed
+ * Test cases for making sure local book works as designed, using the base word parser
  * 
  * @author petern
  * 
@@ -50,7 +50,7 @@ public class LocalBookTests extends TestCase
         final String singleWord = "word";
         final File file = createTempFileWithContents(singleWord);
         final IBook book = LocalBook.getNewBookFromPath(file.getAbsolutePath());
-        final List<String> wordsFoundInBook = book.asWords();
+        final List<String> wordsFoundInBook = book.asWords(new BaseWordParser());
         Assert.assertEquals("Expect to find a single word", 1, wordsFoundInBook.size());
         Assert.assertEquals("Expect to have found a word", singleWord, wordsFoundInBook.get(0));
     }
@@ -61,7 +61,7 @@ public class LocalBookTests extends TestCase
         final String singleWord = "wor1d";
         final File file = createTempFileWithContents(singleWord);
         final IBook book = LocalBook.getNewBookFromPath(file.getAbsolutePath());
-        final List<String> wordsFoundInBook = book.asWords();
+        final List<String> wordsFoundInBook = book.asWords(new BaseWordParser());
         Assert.assertEquals("Expect to not find any words", 0, wordsFoundInBook.size());
     }
 
@@ -75,7 +75,7 @@ public class LocalBookTests extends TestCase
 
         final File file = createTempFileWithContents("asdf a qwerty");
         final IBook book = LocalBook.getNewBookFromPath(file.getAbsolutePath());
-        final List<String> wordsFoundInBook = book.asWords();
+        final List<String> wordsFoundInBook = book.asWords(new BaseWordParser());
 
         for (final String foundWord : wordsFoundInBook)
         {
@@ -90,8 +90,7 @@ public class LocalBookTests extends TestCase
     {
         final File file = createTempFileWithContents(" \n   \t \t\t\n");
         final IBook book = LocalBook.getNewBookFromPath(file.getAbsolutePath());
-        final List<String> wordsFoundInBook = book.asWords();
+        final List<String> wordsFoundInBook = book.asWords(new BaseWordParser());
         Assert.assertEquals("Expect to not find any words", 0, wordsFoundInBook.size());
-
     }
 }

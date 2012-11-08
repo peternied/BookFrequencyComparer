@@ -17,5 +17,5 @@ public interface IBook
      * @return The list of works from this book. This list is expected to be in word occurrence order, with duplicated
      *         entries.
      */
-    List<String> asWords();
+    List<String> asWords(final IWordParser parser);
 }
