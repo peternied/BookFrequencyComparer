@@ -21,7 +21,9 @@ public class ExampleCompareBooks
         final List<String> vernRawWords = vern.asWords(new MutlilineWordParser());
 
         final IBook poe = LocalBook.getNewBookFromPath("C:\\depot\\BookCompare\\test-content\\the_raven.htm");
-        final List<String> poeRawWords = poe.asWords(new MutlilineWordParser());
+        final MutlilineWordParser parser = new MutlilineWordParser();
+        parser.setOnlyStartCountingAfterBodyTag(true);
+        final List<String> poeRawWords = poe.asWords(parser);
 
 
         final Map<String, Integer> vernWordMap = new HashMap<String, Integer>();

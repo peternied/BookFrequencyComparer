@@ -13,8 +13,18 @@ import java.util.List;
  */
 public class MutlilineWordParser extends BasicWordParser
 {
+    protected boolean mRecordAfterBodyTag = false;
+    protected boolean mAfterBodyTag = false;
     protected boolean mInHtmlTag = false;
     protected String mPreviousWordChunk = null;
+
+    /**
+     * Allow users of this parser to specific if we should only start recording words after we've seen a body tag
+     */
+    public void setOnlyStartCountingAfterBodyTag(final boolean startAfterBody)
+    {
+        mRecordAfterBodyTag = startAfterBody;
+    }
 
     @Override
     public List<Character> getValidWordTerminators()
@@ -24,6 +34,25 @@ public class MutlilineWordParser extends BasicWordParser
         // The starting html tag is a way that words can be signified as started
         validWordTermintors.add('<');
         validWordTermintors.add('>');
+
+        // Add in a host of other valid terminators. This might be good canidates to push back into the BasicWordParser
+        validWordTermintors.add('[');
+        validWordTermintors.add(']');
+        validWordTermintors.add('{');
+        validWordTermintors.add('}');
+        validWordTermintors.add('\'');
+        validWordTermintors.add('/');
+        validWordTermintors.add('"');
+        validWordTermintors.add(':');
+        validWordTermintors.add(';');
+        validWordTermintors.add('&');
+        validWordTermintors.add('(');
+        validWordTermintors.add(')');
+        validWordTermintors.add('.');
+        validWordTermintors.add(',');
+        validWordTermintors.add('?');
+        validWordTermintors.add('!');
+
         return validWordTermintors;
     }
 
@@ -70,6 +99,26 @@ public class MutlilineWordParser extends BasicWordParser
             if (currentChar == '<')
             {
                 mInHtmlTag = true;
+
+                // If we are going to use the body tag as a point of reference
+                if (!mAfterBodyTag)
+                {
+                    try
+                    {
+                        System.out.println("Maybe tag: " + line.substring(i + 1, i + 5) + " '" + line.charAt(i + 5)
+                            + "'");
+                        if ("body".equals(line.substring(i + 1, i + 5).toLowerCase())
+                            && isValidWordTerminator(line.charAt(i + 5)))
+                        {
+                            mAfterBodyTag = true;
+                        }
+                    }
+                    catch (final Exception e)
+                    {
+                        // Ignore errors at this point
+                    }
+                }
+
             }
 
             // If we have found a valid word termination then record the word assuming there was a word start
@@ -137,6 +186,12 @@ public class MutlilineWordParser extends BasicWordParser
 
         // Do not allow words that are all upper case to be used
         if (currentWord.equals(currentWord.toUpperCase()))
+        {
+            return;
+        }
+
+        // If we are not past the body tag in the document keep going
+        if (mRecordAfterBodyTag && !mAfterBodyTag)
         {
             return;
         }
