@@ -84,4 +84,14 @@ public class LocalBookTests extends TestCase
         }
         Assert.assertEquals("Expected to find all of the words", expectedWords.size(), wordsFoundInBook.size());
     }
+
+    @Test
+    public void testNoEmptyStringWords() throws Exception
+    {
+        final File file = createTempFileWithContents(" \n   \t \t\t\n");
+        final IBook book = LocalBook.getNewBookFromPath(file.getAbsolutePath());
+        final List<String> wordsFoundInBook = book.asWords();
+        Assert.assertEquals("Expect to not find any words", 0, wordsFoundInBook.size());
+
+    }
 }

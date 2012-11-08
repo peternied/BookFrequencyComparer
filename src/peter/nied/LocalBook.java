@@ -126,7 +126,11 @@ public class LocalBook implements IBook
             {
                 if (lastWordStart != -1)
                 {
-                    words.add(line.substring(lastWordStart, i));
+                    final String word = line.substring(lastWordStart, i);
+                    if (word.length() != 0)
+                    {
+                        words.add(word);
+                    }
                 }
                 lastWordStart = i + 1;
             }
@@ -141,7 +145,11 @@ public class LocalBook implements IBook
         // it is possible that the last word on the line ended at the line end, so make sure we account for it
         if (lastWordStart != -1)
         {
-            words.add(line.substring(lastWordStart, line.length()));
+            final String word = line.substring(lastWordStart, line.length());
+            if (word.length() != 0)
+            {
+                words.add(word);
+            }
         }
     }
 
