@@ -26,6 +26,6 @@ public class ExampleCompareBooks
 
         final List<WordFrequency> poeWordFrequencies = WordFrequencyUtilties.getWordFrequencies(poeRawWords);
 
-        WordFrequencyUtilties.printFrequencyReport("Vern", vernWordFrequencies, "Poe", poeWordFrequencies);
+        WordFrequencyUtilties.printFrequencyReport("Vern", vernWordFrequencies, "Poe", poeWordFrequencies, -1);
     }
 }
